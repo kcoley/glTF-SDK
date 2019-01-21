@@ -12,12 +12,22 @@ file(GLOB schema_deps
     "${CMAKE_CURRENT_LIST_DIR}/schema/*"
 )
 
-add_custom_command(
+if(APPLE)
+    add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/GeneratedFiles/SchemaJson.h
+    COMMAND pwsh -ExecutionPolicy Bypass "${CMAKE_CURRENT_LIST_DIR}/GenerateSchemaJsonHeader.ps1" -outPath "${CMAKE_BINARY_DIR}/GeneratedFiles"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+    DEPENDS "${schema_deps}"
+)
+else()
+    add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/GeneratedFiles/SchemaJson.h
     COMMAND powershell -ExecutionPolicy Bypass "${CMAKE_CURRENT_LIST_DIR}/GenerateSchemaJsonHeader.ps1" -outPath "${CMAKE_BINARY_DIR}/GeneratedFiles"
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS "${schema_deps}"
 )
+endif()
+
 
 add_library(GLTFSDK ${source_files} ${CMAKE_BINARY_DIR}/GeneratedFiles/SchemaJson.h)
 
